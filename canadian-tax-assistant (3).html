@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeremy — Canadian Tax Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f0f4f8;
+  --surface:#ffffff;
+  --surface2:#f7f9fc;
+  --border:#e2e8f0;
+  --border2:#cbd5e1;
+  --accent:#4f86c6;
+  --accent2:#6ba3d6;
+  --accent-soft:rgba(79,134,198,0.1);
+  --accent-softer:rgba(79,134,198,0.06);
+  --teal:#38a89d;
+  --teal-soft:rgba(56,168,157,0.1);
+  --green:#3a9e6e;
+  --green-soft:rgba(58,158,110,0.09);
+  --gold:#c9a84c;
+  --gold-soft:rgba(201,168,76,0.1);
+  --rose:#e07070;
+  --rose-soft:rgba(224,112,112,0.09);
+  --lavender:#8b7ec8;
+  --lavender-soft:rgba(139,126,200,0.1);
+  --text:#1a2332;
+  --text-mid:#4a5568;
+  --text-light:#8898aa;
+  --shadow:rgba(30,60,100,0.07);
+  --shadow2:rgba(30,60,100,0.13);
+  --sidebar-w:220px;
+  --header-h:60px;
+}
+
+html,body{height:100%;overflow:hidden}
+
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* ── TOP HEADER ── */
+.top-header{
+  height:var(--header-h);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 20px;gap:16px;
+  box-shadow:0 1px 8px var(--shadow);
+  flex-shrink:0;
+  z-index:100;
+  position:relative;
+}
+
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  box-shadow:0 3px 10px rgba(79,134,198,0.3);
+  flex-shrink:0;
+}
+.logo-text{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--text);
+  letter-spacing:-0.3px;
+}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:9.5px;color:var(--text-light);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
+
+.year-badge{
+  padding:4px 11px;
+  background:var(--accent-soft);
+  border:1px solid rgba(79,134,198,0.2);
+  border-radius:20px;
+  font-size:11px;font-weight:700;color:var(--accent);
+  display:flex;align-items:center;gap:5px;
+}
+.year-badge::before{
+  content:'';width:6px;height:6px;background:var(--teal);border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+
+/* Deadline countdown in header */
+.deadline-counter{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:12px;color:var(--text-mid);
+}
+.deadline-counter .days{
+  font-size:18px;font-weight:700;
+  font-family:'DM Serif Display',serif;
+  color:var(--accent);
+}
+.deadline-counter.urgent .days{color:var(--rose)}
+.deadline-counter .dl-label{font-size:10px;color:var(--text-light);font-weight:600;line-height:1.2}
+
+/* Person switcher */
+.person-switcher{
+  display:flex;gap:3px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:10px;padding:3px;
+  margin-left:12px;
+}
+.person-btn{
+  font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:700;
+  padding:5px 14px;
+  border:none;border-radius:8px;
+  cursor:pointer;background:transparent;
+  color:var(--text-light);
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:7px;
+}
+.person-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px var(--shadow2)}
+.person-btn:hover:not(.active){color:var(--text-mid)}
+.pa{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white}
+.pa-s{background:linear-gradient(135deg,var(--accent),var(--teal))}
+.pa-n{background:linear-gradient(135deg,var(--lavender),#a78bd4)}
+
+/* Progress bar in header */
+.header-progress{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:var(--text-light);
+  font-weight:600;
+}
+.hprog-track{
+  width:80px;height:6px;
+  background:var(--border);border-radius:10px;overflow:hidden;
+}
+.hprog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--teal));
+  border-radius:10px;
+  transition:width 0.5s ease;
+}
+
+/* ── BODY LAYOUT ── */
+.app-body{
+  flex:1;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+  padding:12px 10px;
+  gap:2px;
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:0}
+
+.nav-section-label{
+  font-size:9.5px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--text-light);
+  padding:8px 10px 4px;margin-top:4px;
+}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:13px;font-weight:600;
+  color:var(--text-mid);
+  transition:all 0.18s;
+  border:none;background:transparent;
+  width:100%;text-align:left;
+  font-family:'Nunito',sans-serif;
+  position:relative;
+}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent)}
+.nav-item .ni-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-item .ni-badge{
+  margin-left:auto;
+  background:var(--accent);color:white;
+  font-size:9px;font-weight:800;
+  padding:1px 6px;border-radius:20px;
+}
+.nav-item.active .ni-badge{background:var(--accent)}
+
+/* ── MAIN CONTENT ── */
+.main-content{
+  flex:1;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+}
+
+.tab-panel{display:none;flex-direction:column;height:100%;overflow:hidden}
+.tab-panel.active{display:flex}
+
+/* Scrollable content area inside panels */
+.panel-scroll{
+  flex:1;overflow-y:auto;
+  padding:24px;
+}
+.panel-scroll::-webkit-scrollbar{width:5px}
+.panel-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* Panel headers */
+.panel-title{
+  font-family:'DM Serif Display',serif;
+  font-size:24px;color:var(--text);
+  margin-bottom:4px;
+}
+.panel-title em{color:var(--accent);font-style:italic}
+.panel-sub{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:22px}
+
+/* ── CARDS ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px 20px;
+  margin-bottom:14px;
+  box-shadow:0 2px 10px var(--shadow);
+}
+.card-title{
+  font-size:10.5px;font-weight:800;letter-spacing:0.8px;
+  text-transform:uppercase;color:var(--text-light);
+  margin-bottom:14px;
+}
+
+/* ── CHAT TAB ── */
+#chat-messages{
+  flex:1;overflow-y:auto;
+  padding:20px 20px 10px;
+  display:flex;flex-direction:column;gap:14px;
+  scroll-behavior:smooth;
+}
+#chat-messages::-webkit-scrollbar{width:4px}
+#chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+.message{
+  display:flex;gap:10px;max-width:760px;
+  animation:msgIn 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.message.user{align-self:flex-end;flex-direction:row-reverse;max-width:620px}
+
+.msg-avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  margin-top:18px;box-shadow:0 2px 6px var(--shadow2);
+}
+.msg-avatar.ai{background:linear-gradient(135deg,var(--accent),var(--teal))}
+.msg-avatar.user-av{background:var(--bg);border:1.5px solid var(--border2);font-size:12px}
+
+.bubble-wrap{display:flex;flex-direction:column;gap:3px}
+.msg-label{font-size:9.5px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--text-light);padding:0 4px}
+.message.user .msg-label{text-align:right;color:var(--accent)}
+
+.bubble{
+  padding:12px 16px;border-radius:14px;
+  font-size:13.5px;line-height:1.72;
+}
+.message.ai .bubble{
+  background:var(--surface);border:1px solid var(--border);
+  border-top-left-radius:4px;box-shadow:0 2px 10px var(--shadow);
+  color:var(--text);
+}
+.message.user .bubble{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-top-right-radius:4px;color:white;
+  box-shadow:0 4px 16px rgba(79,134,198,0.25);
+}
+.bubble strong{color:var(--accent);font-weight:700}
+.message.user .bubble strong{color:rgba(255,255,255,0.88)}
+
+/* Welcome card */
+.welcome-card{
+  background:linear-gradient(140deg,var(--surface) 60%,#eef4fb);
+  border:1px solid var(--border);border-radius:18px;
+  padding:22px;box-shadow:0 4px 20px var(--shadow);
+  position:relative;overflow:hidden;
+}
+.welcome-card::after{
+  content:'🍁';position:absolute;right:20px;top:50%;
+  transform:translateY(-50%);font-size:60px;opacity:0.05;pointer-events:none;
+}
+.welcome-title{
+  font-family:'DM Serif Display',serif;font-size:20px;
+  color:var(--text);margin-bottom:8px;line-height:1.3;
+}
+.welcome-title em{color:var(--accent);font-style:italic}
+.welcome-body{font-size:13px;color:var(--text-mid);line-height:1.72;max-width:480px}
+.welcome-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.wpill{
+  display:flex;align-items:center;gap:5px;padding:5px 11px;
+  background:var(--accent-softer);border:1px solid rgba(79,134,198,0.14);
+  border-radius:20px;font-size:11.5px;color:var(--text-mid);font-weight:600;
+}
+
+.memory-banner{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;margin-bottom:4px;
+  background:var(--green-soft);border:1px solid rgba(58,158,110,0.2);
+  border-radius:10px;font-size:12px;color:var(--green);
+}
+.memory-banner strong{font-weight:700}
+
+/* Typing */
+.typing-indicator{display:flex;gap:5px;align-items:center;padding:4px 2px}
+.typing-indicator span{
+  width:7px;height:7px;background:var(--accent2);border-radius:50%;
+  animation:bounce 1.3s infinite;
+}
+.typing-indicator span:nth-child(2){animation-delay:0.18s}
+.typing-indicator span:nth-child(3){animation-delay:0.36s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.3}30%{transform:translateY(-6px);opacity:1}}
+
+/* Chips */
+.chips-area{padding:0 20px 10px;flex-shrink:0}
+.chips-label{font-size:9.5px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:var(--text-light);margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  font-family:'Nunito',sans-serif;font-size:12.5px;font-weight:600;
+  padding:6px 13px;border:1.5px solid var(--border2);border-radius:20px;
+  background:var(--surface);color:var(--text-mid);cursor:pointer;
+  transition:all 0.18s;white-space:nowrap;box-shadow:0 1px 4px var(--shadow);
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
+
+/* Input */
+.chat-input-area{
+  padding:12px 20px 16px;
+  background:var(--surface);border-top:1px solid var(--border);
+  flex-shrink:0;box-shadow:0 -2px 14px var(--shadow);
+}
+.input-box{
+  display:flex;gap:8px;align-items:flex-end;
+  background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:14px;padding:9px 9px 9px 14px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.input-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,134,198,0.1)}
+textarea{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'Nunito',sans-serif;
+  font-size:13.5px;resize:none;line-height:1.5;
+  max-height:110px;min-height:22px;
+}
+textarea::placeholder{color:var(--text-light)}
+#send-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:white;
+  transition:all 0.2s;box-shadow:0 3px 10px rgba(79,134,198,0.3);
+}
+#send-btn:hover{transform:translateY(-1px) scale(1.05);box-shadow:0 5px 16px rgba(79,134,198,0.38)}
+#send-btn:active{transform:scale(0.94)}
+#send-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;box-shadow:none}
+#send-btn svg{width:15px;height:15px}
+.input-footer{text-align:center;margin-top:7px;font-size:10px;color:var(--text-light)}
+.input-footer strong{color:var(--accent);font-weight:700}
+
+/* ── CHECKLIST ── */
+.progress-wrap{margin-bottom:20px}
+.prog-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-mid);margin-bottom:6px;font-weight:600}
+.prog-track{height:8px;background:var(--border);border-radius:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:10px;transition:width 0.5s ease}
+
+.cl-section-label{
+  font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-light);margin:18px 0 8px;
+  display:flex;align-items:center;gap:8px;
+}
+.cl-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.cl-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 14px;margin-bottom:7px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;cursor:pointer;transition:all 0.18s;
+  box-shadow:0 1px 4px var(--shadow);
+}
+.cl-item:hover{border-color:var(--accent2);box-shadow:0 3px 10px var(--accent-soft)}
+.cl-item.checked{background:var(--green-soft);border-color:rgba(58,158,110,0.25)}
+.cl-check{
+  width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;background:white;margin-top:1px;
+}
+.cl-item.checked .cl-check{background:var(--green);border-color:var(--green)}
+.cl-check svg{display:none}
+.cl-item.checked .cl-check svg{display:block}
+.cl-label{font-size:13.5px;font-weight:600;color:var(--text)}
+.cl-item.checked .cl-label{color:var(--green);text-decoration:line-through;opacity:0.7}
+.cl-desc{font-size:12px;color:var(--text-light);margin-top:3px;line-height:1.5}
+
+/* ── GUIDE ── */
+.step-card{
+  display:flex;gap:14px;padding:16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:10px;
+  box-shadow:0 2px 8px var(--shadow);transition:all 0.2s;
+}
+.step-card.done{background:var(--green-soft);border-color:rgba(58,158,110,0.2)}
+.step-num{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:white;
+  box-shadow:0 2px 8px rgba(79,134,198,0.25);
+}
+.step-card.done .step-num{background:var(--green)}
+.step-body{flex:1}
+.step-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px}
+.step-card.done .step-title{color:var(--green)}
+.step-desc{font-size:12.5px;color:var(--text-mid);line-height:1.6}
+.step-desc strong{color:var(--accent);font-weight:700}
+.step-tip{
+  margin-top:8px;padding:8px 10px;
+  background:var(--accent-softer);border:1px solid rgba(79,134,198,0.12);
+  border-radius:8px;font-size:11.5px;color:var(--text-mid);line-height:1.5;
+}
+.step-done-btn{
+  margin-top:10px;padding:6px 16px;
+  border:1.5px solid var(--accent);border-radius:20px;
+  background:transparent;color:var(--accent);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+}
+.step-done-btn:hover{background:var(--accent);color:white}
+.step-card.done .step-done-btn{display:none}
+
+/* ── CALCULATOR ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-mid);margin-bottom:5px}
+.field .hint{font-size:11px;color:var(--text-light);margin-bottom:5px}
+.field input{
+  width:100%;padding:10px 14px;
+  background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:'Nunito',sans-serif;
+  font-size:14px;color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,134,198,0.09)}
+.field input::placeholder{color:var(--text-light)}
+.action-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  border:none;border-radius:12px;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:white;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 14px rgba(79,134,198,0.28);margin-top:4px;
+}
+.action-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,134,198,0.35)}
+.action-btn:active{transform:scale(0.98)}
+
+.result-card{
+  background:linear-gradient(135deg,var(--surface),#eef4fb);
+  border:1.5px solid rgba(79,134,198,0.2);
+  border-radius:16px;padding:20px;
+  box-shadow:0 4px 20px var(--accent-soft);
+  display:none;animation:msgIn 0.35s ease;margin-top:14px;
+}
+.result-card.show{display:block}
+.result-amount{
+  font-family:'DM Serif Display',serif;font-size:40px;font-weight:400;
+  color:var(--accent);letter-spacing:-1px;margin:6px 0;
+}
+.result-label{font-size:10.5px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-light)}
+.result-owing{color:var(--rose)}
+.result-breakdown{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.result-row{display:flex;justify-content:space-between;font-size:13px}
+.result-row .rl{color:var(--text-mid)}
+.result-row .rv{font-weight:700;color:var(--text)}
+.result-note{font-size:11.5px;color:var(--text-light);margin-top:12px;line-height:1.6}
+
+/* ── APPS ── */
+.app-section-label{
+  font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-light);margin:18px 0 8px;
+  display:flex;align-items:center;gap:8px;
+}
+.app-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.app-card{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 16px;margin-bottom:10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;box-shadow:0 2px 8px var(--shadow);
+  transition:all 0.18s;
+}
+.app-card:hover{border-color:var(--border2);box-shadow:0 4px 14px var(--shadow2);transform:translateY(-1px)}
+.app-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 2px 6px var(--shadow2)}
+.app-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.app-desc{font-size:12.5px;color:var(--text-mid);line-height:1.55}
+.app-tag{display:inline-block;margin-top:6px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:800}
+.tag-required{background:var(--accent-soft);color:var(--accent)}
+.tag-free{background:var(--green-soft);color:var(--green)}
+.tag-optional{background:var(--bg);color:var(--text-light);border:1px solid var(--border)}
+
+/* ── PROFILE ── */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.profile-grid.single{grid-template-columns:1fr}
+.pfield{display:flex;flex-direction:column;gap:5px}
+.pfield label{font-size:12.5px;font-weight:700;color:var(--text-mid)}
+.pfield input,.pfield select,.pfield textarea{
+  padding:9px 13px;
+  background:var(--bg);border:1.5px solid var(--border2);
+  border-radius:10px;font-family:'Nunito',sans-serif;
+  font-size:13.5px;color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.pfield input:focus,.pfield select:focus,.pfield textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,134,198,0.09)}
+.pfield input::placeholder,.pfield textarea::placeholder{color:var(--text-light)}
+.pfield textarea{resize:vertical;min-height:70px;line-height:1.5}
+.pfield select{cursor:pointer}
+.save-badge{display:none;align-items:center;justify-content:center;gap:6px;padding:10px;margin-top:10px;background:var(--green-soft);border:1px solid rgba(58,158,110,0.2);border-radius:10px;font-size:13px;color:var(--green);font-weight:600}
+.save-badge.show{display:flex;animation:msgIn 0.3s ease}
+.reset-link{display:block;text-align:center;margin-top:14px;font-size:11.5px;color:var(--text-light);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.reset-link:hover{color:var(--rose)}
+
+/* ── TIPS ── */
+.tip-gen-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--accent),var(--teal));
+  border:none;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:white;
+  cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 16px rgba(79,134,198,0.28);margin-bottom:8px;
+}
+.tip-gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(79,134,198,0.35)}
+.tip-gen-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.tip-gen-note{font-size:11.5px;color:var(--text-light);text-align:center;margin-bottom:20px}
+.tip-loading{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;box-shadow:0 2px 8px var(--shadow)}
+.tip-section-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.tip-section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.tip-card{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;margin-bottom:10px;border-radius:14px;border:1px solid var(--border);box-shadow:0 2px 8px var(--shadow);transition:transform 0.2s}
+.tip-card:hover{transform:translateY(-1px)}
+.tip-green{background:linear-gradient(135deg,#f0faf5,var(--surface));border-color:rgba(58,158,110,0.18)}
+.tip-blue{background:linear-gradient(135deg,#eef4fb,var(--surface));border-color:rgba(79,134,198,0.18)}
+.tip-gold{background:linear-gradient(135deg,#fdf8ec,var(--surface));border-color:rgba(201,168,76,0.2)}
+.tip-lavender{background:linear-gradient(135deg,#f3f1fb,var(--surface));border-color:rgba(139,126,200,0.18)}
+.tip-rose{background:linear-gradient(135deg,#fdf3f3,var(--surface));border-color:rgba(224,112,112,0.18)}
+.tip-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.tip-title{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.3}
+.tip-desc{font-size:12.5px;color:var(--text-mid);line-height:1.65}
+.tip-desc strong{color:var(--accent);font-weight:700}
+.tip-ai-card{background:var(--surface);border:1px solid rgba(79,134,198,0.2);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 12px var(--accent-soft);animation:msgIn 0.3s ease}
+.tip-ai-tag{display:inline-block;padding:2px 9px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px}
+.tip-ai-text{font-size:13.5px;color:var(--text);line-height:1.7}
+.tip-ai-text strong{color:var(--accent);font-weight:700}
+.tip-savings{font-size:11.5px;font-weight:700;color:var(--green);margin-bottom:6px}
+
+/* ── GLOSSARY ── */
+.glossary-search-wrap{position:relative;margin-bottom:18px}
+.glossary-search{
+  width:100%;padding:11px 16px 11px 40px;
+  background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:12px;font-family:'Nunito',sans-serif;
+  font-size:14px;color:var(--text);outline:none;transition:border-color 0.2s;
+}
+.glossary-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,134,198,0.09)}
+.glossary-search::placeholder{color:var(--text-light)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.glossary-item{
+  padding:14px 16px;margin-bottom:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;box-shadow:0 1px 4px var(--shadow);
+}
+.glossary-term{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:5px}
+.glossary-def{font-size:13px;color:var(--text-mid);line-height:1.65}
+.glossary-example{font-size:11.5px;color:var(--text-light);margin-top:5px;font-style:italic}
+.glossary-hidden{display:none}
+
+/* ── COUPLE'S OPTIMIZER ── */
+.optimizer-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 10px var(--shadow)}
+.opt-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.opt-row:last-child{border-bottom:none}
+.opt-who{width:130px;flex-shrink:0}
+.opt-who-btn{
+  width:100%;padding:7px 12px;border-radius:8px;border:1.5px solid var(--border2);
+  background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  color:var(--text-mid);cursor:pointer;transition:all 0.18s;
+}
+.opt-who-btn.samira{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.opt-who-btn.sean{background:var(--lavender-soft);border-color:var(--lavender);color:var(--lavender)}
+.opt-label{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.opt-reason{font-size:11.5px;color:var(--text-light);margin-top:2px;line-height:1.4}
+.opt-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<div class="top-header">
+  <div class="logo">
+    <div class="logo-icon">🍁</div>
+    <div>
+      <div class="logo-text">Jer<span>emy</span></div>
+      <div class="logo-sub">Canadian Tax Assistant</div>
+    </div>
+  </div>
+  <div class="year-badge">2025 Tax Year</div>
+
+  <div class="person-switcher">
+    <button class="person-btn active" id="btn-samira" onclick="switchPerson('samira')">
+      <div class="pa pa-s">S</div> Samira
+    </button>
+    <button class="person-btn" id="btn-sean" onclick="switchPerson('sean')">
+      <div class="pa pa-n">S</div> Sean
+    </button>
+  </div>
+
+  <div class="header-progress" id="header-progress" style="margin-left:16px">
+    <span id="hprog-label" style="font-size:11px;color:var(--text-light);font-weight:600">Progress</span>
+    <div class="hprog-track"><div class="hprog-fill" id="hprog-fill" style="width:0%"></div></div>
+    <span id="hprog-pct" style="font-size:11px;font-weight:700;color:var(--accent)">0%</span>
+  </div>
+
+  <div class="deadline-counter" id="deadline-counter" style="margin-left:auto">
+    <div>
+      <div class="days" id="days-left">--</div>
+      <div class="dl-label">days left<br>to file</div>
+    </div>
+    <div style="font-size:11px;color:var(--text-light);line-height:1.4">April 30,<br>2026</div>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar">
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" onclick="switchTab('chat')" data-tab="chat">
+      <span class="ni-icon">💬</span> Chat with Jeremy
+    </button>
+    <button class="nav-item" onclick="switchTab('guide')" data-tab="guide">
+      <span class="ni-icon">🧭</span> Step-by-Step Guide
+    </button>
+    <button class="nav-item" onclick="switchTab('checklist')" data-tab="checklist">
+      <span class="ni-icon">✅</span> Document Checklist
+    </button>
+
+    <div class="nav-section-label">Tools</div>
+    <button class="nav-item" onclick="switchTab('calc')" data-tab="calc">
+      <span class="ni-icon">💰</span> Refund Calculator
+    </button>
+    <button class="nav-item" onclick="switchTab('optimizer')" data-tab="optimizer">
+      <span class="ni-icon">👫</span> Couple's Optimizer
+    </button>
+    <button class="nav-item" onclick="switchTab('tips')" data-tab="tips">
+      <span class="ni-icon">💡</span> Money-Saving Tips
+    </button>
+    <button class="nav-item" onclick="switchTab('glossary')" data-tab="glossary">
+      <span class="ni-icon">📖</span> Tax Glossary
+    </button>
+
+    <div class="nav-section-label">Setup</div>
+    <button class="nav-item" onclick="switchTab('apps')" data-tab="apps">
+      <span class="ni-icon">📱</span> Apps You Need
+    </button>
+    <button class="nav-item" onclick="switchTab('profile')" data-tab="profile">
+      <span class="ni-icon">👤</span> My Profile
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- CHAT -->
+    <div class="tab-panel active" id="panel-chat">
+      <div id="chat-messages">
+        <div class="memory-banner" id="memory-banner" style="display:none">
+          🧠 <span id="memory-text"></span>
+        </div>
+        <div class="welcome-card">
+          <div class="welcome-title">Hi <span id="welcome-name">Samira</span>! I'm <em>Jeremy</em> 🍁</div>
+          <div class="welcome-body">Your personal Canadian tax guide. I keep your taxes and Sean's completely separate. Ask me anything — I'll explain it simply, step by step.</div>
+          <div class="welcome-pills">
+            <div class="wpill">🧠 Remembers everything</div>
+            <div class="wpill">📖 Full CRA knowledge</div>
+            <div class="wpill">👫 Samira + Sean</div>
+            <div class="wpill">💡 Money-saving tips</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips-area" id="chips-wrap">
+        <div class="chips-label">Quick questions</div>
+        <div class="chips">
+          <div class="chip" onclick="sendChip(this)">🚀 Where do I even start?</div>
+          <div class="chip" onclick="sendChip(this)">📄 Walk me through my T4</div>
+          <div class="chip" onclick="sendChip(this)">🔐 How do I set up CRA My Account?</div>
+          <div class="chip" onclick="sendChip(this)">🍃 How do I use Wealthsimple Tax?</div>
+          <div class="chip" onclick="sendChip(this)">💰 What can I claim to get more money back?</div>
+          <div class="chip" onclick="sendChip(this)">❌ What mistakes should I avoid?</div>
+          <div class="chip" onclick="sendChip(this)">🏦 What is an RRSP in simple words?</div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-box">
+          <textarea id="user-input" placeholder="Ask Jeremy anything about your 2025 taxes..." rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button id="send-btn" onclick="sendMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="input-footer">Jeremy is powered by Claude · Filing deadline <strong>April 30, 2026</strong> · File via simpletax.ca</div>
+      </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div class="tab-panel" id="panel-guide">
+      <div class="panel-scroll">
+        <div class="panel-title">Step-by-Step <em>Filing Guide</em></div>
+        <div class="panel-sub">Follow these steps in order. Mark each one done as you go — Jeremy saves your progress automatically.</div>
+        <div id="steps-container"></div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="tab-panel" id="panel-checklist">
+      <div class="panel-scroll">
+        <div class="panel-title">Document <em>Checklist</em></div>
+        <div class="panel-sub">Gather everything before you start. Tap each item when you have it ready.</div>
+        <div class="progress-wrap">
+          <div class="prog-labels">
+            <span id="cl-label">0 of 0 items ready</span>
+            <span id="cl-pct">0%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="cl-bar" style="width:0%"></div></div>
+        </div>
+        <div id="checklist-container"></div>
+      </div>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div class="tab-panel" id="panel-calc">
+      <div class="panel-scroll">
+        <div class="panel-title">Refund <em>Estimator</em></div>
+        <div class="panel-sub">Enter numbers from your T4 slip. Jeremy does the math for you.</div>
+        <div class="card">
+          <div class="card-title">📄 Your T4 Numbers</div>
+          <div class="field"><label>Box 14 — Employment Income</label><div class="hint">Your total gross salary for 2025</div><input type="number" id="box14" placeholder="e.g. 65000"></div>
+          <div class="field"><label>Box 22 — Federal Tax Deducted</label><div class="hint">Federal tax your employer already took off your paycheque</div><input type="number" id="box22" placeholder="e.g. 9000"></div>
+          <div class="field"><label>Box 26 — Alberta Tax Deducted</label><div class="hint">Alberta tax your employer took off</div><input type="number" id="box26" placeholder="e.g. 4500"></div>
+          <div class="field"><label>RRSP Contributions (optional)</label><div class="hint">RRSP contributions made in 2025 or Jan 1–Mar 2, 2026</div><input type="number" id="rrsp" placeholder="e.g. 5000"></div>
+          <button class="action-btn" onclick="calculateRefund()">Calculate My Estimate</button>
+        </div>
+        <div class="result-card" id="result-card">
+          <div class="result-label" id="result-label">Estimated Refund</div>
+          <div class="result-amount" id="result-amount"></div>
+          <div class="result-breakdown" id="result-breakdown"></div>
+          <div class="result-note">⚠️ Rough estimate only. Your actual amount may differ. Always file through Wealthsimple Tax for your official return.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUPLE'S OPTIMIZER -->
+    <div class="tab-panel" id="panel-optimizer">
+      <div class="panel-scroll">
+        <div class="panel-title">Couple's <em>Optimizer</em></div>
+        <div class="panel-sub">Some deductions save more money depending on <em>who</em> claims them. Here's who should claim what — tap to toggle.</div>
+
+        <div class="optimizer-card">
+          <div class="card-title">👫 Who Claims What — Toggle to match your situation</div>
+          <div id="opt-rows"></div>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,#eef4fb,var(--surface))">
+          <div class="card-title">💡 How This Works</div>
+          <p style="font-size:13px;color:var(--text-mid);line-height:1.7">
+            In Canada, couples file taxes <strong style="color:var(--accent)">separately</strong> — but some deductions work better on one return than the other.<br><br>
+            For example, medical expenses and childcare usually save more when claimed by the <strong style="color:var(--accent)">lower-income spouse</strong>. Charitable donations are better combined on the <strong style="color:var(--accent)">higher-income spouse</strong> for a bigger credit.<br><br>
+            Your accountant knew this. Now Jeremy does too. 😊
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tab-panel" id="panel-tips">
+      <div class="panel-scroll">
+        <div class="panel-title">Save <em>More Money</em> 💡</div>
+        <div class="panel-sub">Things accountants do that most people miss. Tap generate for tips based on your profile.</div>
+
+        <div id="tips-gen-area">
+          <button class="tip-gen-btn" onclick="generateTips()"><span id="tips-btn-text">✨ Generate My Personalized Tips</span></button>
+          <div class="tip-gen-note">Jeremy reads your profile and finds savings just for you.</div>
+        </div>
+        <div id="tips-loading" style="display:none">
+          <div class="tip-loading">
+            <div class="typing-indicator" style="justify-content:center"><span></span><span></span><span></span></div>
+            <div style="font-size:13px;color:var(--text-mid);margin-top:10px">Finding savings opportunities...</div>
+          </div>
+        </div>
+        <div id="tips-ai-container" style="display:none"></div>
+
+        <div class="tip-section-label">📌 Tips Everyone Should Know</div>
+
+        <div class="tip-card tip-blue"><div class="tip-icon">💰</div><div><div class="tip-title">Basic Personal Amount — always automatic</div><div class="tip-desc">Every Canadian gets <strong>$16,129 federal</strong> + <strong>$22,323 Alberta</strong> tax-free. Wealthsimple applies this automatically.</div></div></div>
+        <div class="tip-card tip-green"><div class="tip-icon">🏦</div><div><div class="tip-title">RRSP = instant tax savings</div><div class="tip-desc">Every $1 in an RRSP reduces your taxable income by $1. A <strong>$5,000 contribution</strong> can save you $700–$1,000+ depending on your bracket. Deadline: <strong>March 2, 2026</strong>.</div></div></div>
+        <div class="tip-card tip-gold"><div class="tip-icon">🏠</div><div><div class="tip-title">Work from home? Claim it</div><div class="tip-desc">If your employer signed a <strong>T2200</strong>, you can deduct part of your rent, internet, and utilities. Ask your HR department.</div></div></div>
+        <div class="tip-card tip-blue"><div class="tip-icon">🩺</div><div><div class="tip-title">Medical expenses add up</div><div class="tip-desc">Prescriptions, dental, glasses, physio all count. Claim everything above <strong>$2,635</strong> (or 3% of net income). Best claimed on the lower-income spouse.</div></div></div>
+        <div class="tip-card tip-lavender"><div class="tip-icon">❤️</div><div><div class="tip-title">Bundle charitable donations</div><div class="tip-desc">First $200 = 15% credit. Everything above = <strong>29% credit</strong>. Combine 2 years of donations into one return for a bigger payout. Claim on the higher earner.</div></div></div>
+        <div class="tip-card tip-green"><div class="tip-icon">📋</div><div><div class="tip-title">Check Box 44 on your T4</div><div class="tip-desc">This shows union dues already paid. Wealthsimple claims it automatically. Also check any professional membership fees you paid yourself.</div></div></div>
+        <div class="tip-card tip-gold"><div class="tip-icon">👶</div><div><div class="tip-title">Childcare goes on the lower earner</div><div class="tip-desc">Daycare, summer camp, babysitters. Must be claimed by the <strong>lower-income spouse</strong>. Up to <strong>$8,000/child</strong> under 7 and <strong>$5,000</strong> age 7–16.</div></div></div>
+        <div class="tip-card tip-blue"><div class="tip-icon">⚡</div><div><div class="tip-title">Set up direct deposit</div><div class="tip-desc">Register through CRA My Account or your bank. Refund arrives in <strong>2 weeks</strong> instead of 6–8 weeks by cheque.</div></div></div>
+        <div class="tip-card tip-rose"><div class="tip-icon">⚠️</div><div><div class="tip-title">File on time even if you can't pay</div><div class="tip-desc">Late filing when you owe = <strong>5% penalty</strong> + 1% per month. File on time, pay what you can. Always.</div></div></div>
+      </div>
+    </div>
+
+    <!-- GLOSSARY -->
+    <div class="tab-panel" id="panel-glossary">
+      <div class="panel-scroll">
+        <div class="panel-title">Tax <em>Glossary</em></div>
+        <div class="panel-sub">Every confusing tax word explained in plain English. Search for any term.</div>
+        <div class="glossary-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="glossary-search" id="glossary-input" placeholder="Search a term, e.g. RRSP, T4, deduction..." oninput="filterGlossary(this.value)">
+        </div>
+        <div id="glossary-list"></div>
+      </div>
+    </div>
+
+    <!-- APPS -->
+    <div class="tab-panel" id="panel-apps">
+      <div class="panel-scroll">
+        <div class="panel-title">Apps You <em>Need</em></div>
+        <div class="panel-sub">Everything you'll need to file your 2025 taxes. Start with the essentials.</div>
+        <div id="apps-container"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="tab-panel" id="panel-profile">
+      <div class="panel-scroll">
+        <div class="panel-title">Your <em>Profile</em></div>
+        <div class="panel-sub">Fill this in once. Jeremy remembers it forever and uses it in every chat and tip. Samira and Sean each have their own profile.</div>
+
+        <div class="card">
+          <div class="card-title">👤 Personal Info</div>
+          <div class="profile-grid">
+            <div class="pfield"><label>First Name</label><input type="text" id="p-name" placeholder="e.g. Samira"></div>
+            <div class="pfield"><label>City</label><input type="text" id="p-city" placeholder="e.g. Calgary"></div>
+            <div class="pfield"><label>Province</label>
+              <select id="p-province">
+                <option value="Alberta">Alberta</option>
+                <option value="British Columbia">British Columbia</option>
+                <option value="Ontario">Ontario</option>
+                <option value="Quebec">Quebec</option>
+                <option value="Saskatchewan">Saskatchewan</option>
+                <option value="Manitoba">Manitoba</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="pfield"><label>Filing Status</label>
+              <select id="p-status">
+                <option value="married/common-law">Married / Common-law</option>
+                <option value="single">Single</option>
+                <option value="divorced/separated">Divorced / Separated</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">💼 Tax Situation</div>
+          <div class="profile-grid">
+            <div class="pfield"><label>Income Type</label>
+              <select id="p-income-type">
+                <option value="employed (T4 only)">Employed — T4 only</option>
+                <option value="employed + side income">Employed + side income</option>
+                <option value="self-employed">Self-employed</option>
+                <option value="retired">Retired / pension</option>
+                <option value="student">Student</option>
+              </select>
+            </div>
+            <div class="pfield"><label>Experience</label>
+              <select id="p-experience">
+                <option value="first time filing alone">First time filing alone</option>
+                <option value="filed before but need help">Filed before, need help</option>
+                <option value="comfortable filer">Comfortable filer</option>
+              </select>
+            </div>
+            <div class="pfield"><label>CRA My Account?</label>
+              <select id="p-cra"><option value="yes">Yes ✓</option><option value="no">No — need to set up</option><option value="not sure">Not sure</option></select>
+            </div>
+            <div class="pfield"><label>Filing Software</label>
+              <select id="p-software">
+                <option value="Wealthsimple Tax">Wealthsimple Tax</option>
+                <option value="TurboTax">TurboTax</option>
+                <option value="H&R Block">H&R Block</option>
+                <option value="not decided yet">Not decided yet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📝 Notes for Jeremy</div>
+          <div class="profile-grid single">
+            <div class="pfield"><label>Anything else Jeremy should know?</label>
+              <textarea id="p-notes" placeholder="e.g. I work from home 3 days a week. I made RRSP contributions. I have kids in daycare. I have a side job..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🎨 How Jeremy Talks to You</div>
+          <div class="profile-grid">
+            <div class="pfield"><label>Answer Style</label>
+              <select id="p-style">
+                <option value="short and simple, beginner-friendly">Short & simple (beginner)</option>
+                <option value="detailed with full explanations">Detailed explanations</option>
+                <option value="bullet points">Bullet points</option>
+                <option value="step by step only">Step-by-step only</option>
+              </select>
+            </div>
+            <div class="pfield"><label>Tone</label>
+              <select id="p-tone">
+                <option value="friendly, warm, and patient like a kind friend">Friendly & patient</option>
+                <option value="professional and formal">Professional</option>
+                <option value="super simple, like explaining to a child">Super simple</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="action-btn" onclick="saveProfile()">💾 Save My Profile</button>
+        <div class="save-badge" id="saved-badge">✅ Saved! Jeremy will use this in every chat.</div>
+        <span class="reset-link" onclick="resetAll()">Reset all saved data for both Samira and Sean</span>
+        <span class="reset-link" style="margin-top:6px" onclick="localStorage.removeItem('jeremy_api_key');alert('API key cleared. You\'ll be asked to enter it again next time.')">Reset API key</span>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end app-body -->
+
+<script>
+// ═══════════════════════════════════════════════
+// MEMORY
+// ═══════════════════════════════════════════════
+let currentPerson = 'samira';
+
+function saveMemory(key,val){try{localStorage.setItem(`jeremy_${currentPerson}_${key}`,JSON.stringify(val))}catch(e){}}
+function loadMemory(key,def){try{const v=localStorage.getItem(`jeremy_${currentPerson}_${key}`);return v?JSON.parse(v):def}catch(e){return def}}
+
+// ═══════════════════════════════════════════════
+// SYSTEM PROMPT
+// ═══════════════════════════════════════════════
+function buildSystemPrompt(){
+  const p=loadMemory('profile',{});
+  const name=p.name||(currentPerson==='samira'?'Samira':'Sean');
+  const city=p.city||'Calgary';
+  const province=p.province||'Alberta';
+  const status=p.status||'married/common-law';
+  const incomeType=p.incomeType||'employed (T4 only)';
+  const experience=p.experience||'first time filing alone';
+  const cra=p.cra||'yes';
+  const software=p.software||'Wealthsimple Tax';
+  const notes=p.notes?`Extra context: ${p.notes}`:'';
+  const style=p.style||'short and simple, beginner-friendly';
+  const tone=p.tone||'friendly, warm, and patient like a kind friend';
+
+  return `You are Jeremy — a patient, beginner-friendly Canadian tax assistant for the 2025 tax year (filed in spring 2026).
+
+═══════════════════════════════
+WHO YOU ARE
+═══════════════════════════════
+You are like a kind, knowledgeable friend sitting next to someone doing taxes for the first time.
+You never rush. You never assume they know things. You explain everything simply.
+You are currently helping: ${name} (${currentPerson}).
+${notes}
+
+═══════════════════════════════
+HOW YOU SPEAK — ALWAYS
+═══════════════════════════════
+- Tone: ${tone}
+- Style: ${style}
+- Short sentences. One idea at a time. Simple words.
+- Never use jargon without explaining it immediately after.
+- Use **bold** for important numbers or terms.
+- Number your steps when explaining a process. One sentence per step.
+- End step-by-step answers with "Does that make sense? Ask me anything!"
+- Never make them feel stupid. Be warm. Be encouraging.
+- Max 3-4 sentences per paragraph. Break things up.
+
+═══════════════════════════════
+ABOUT THIS USER
+═══════════════════════════════
+- Name: ${name}
+- Lives in: ${city}, ${province}
+- Filing status: ${status} (spouse is ${currentPerson==='samira'?'Sean':'Samira'})
+- Income type: ${incomeType}
+- Experience: ${experience}
+- CRA My Account: ${cra}
+- Filing with: ${software}
+- ${notes}
+
+═══════════════════════════════
+CRA — CANADA REVENUE AGENCY
+═══════════════════════════════
+CRA is the government tax office. Think of it as "the tax people."
+
+KEY CRA TOOLS:
+• CRA My Account (canada.ca/my-cra-account) — your personal online tax portal. View slips, check RRSP room, see refund status, get notices.
+• Auto-fill my return — connects to CRA and pulls your T4s and slips directly into Wealthsimple. Saves a lot of typing.
+• NETFILE — the secure way to submit your return from approved software. No mailing needed.
+• MyCRA app — mobile app to check refund status and view notices.
+• Notice of Assessment (NOA) — CRA's letter confirming your return was accepted. Keep this. You'll need it next year.
+• My Benefits CRA app — track GST/HST credit and Canada Child Benefit payments.
+• Represent a Client — lets someone file on your behalf.
+• NETFILE certification — only approved software can file electronically.
+
+CRA DEADLINES (2025 tax year):
+• April 30, 2026 — filing deadline. Also when any balance owing must be paid.
+• June 15, 2026 — deadline for self-employed (balance still due April 30).
+• March 2, 2026 — last day for RRSP contributions that count for 2025.
+• Late filing penalty: 5% of balance + 1% per month. Always file on time.
+
+═══════════════════════════════
+TAX SLIPS — ALL OF THEM
+═══════════════════════════════
+T4 — Employment income (from employer). Most important.
+  Box 14 = total income
+  Box 22 = federal tax taken off
+  Box 16 = CPP contributions
+  Box 18 = EI premiums
+  Box 26 = Alberta provincial tax taken off
+  Box 44 = union dues
+  Box 52 = pension adjustment (affects RRSP room)
+T4A — Other income: scholarships, pensions, CERB, freelance.
+T4E — EI (Employment Insurance) income.
+T4P — CPP, OAS, pension income.
+T3 — Trust income from mutual funds or ETFs.
+T5 — Investment income: bank interest, stock dividends.
+T5008 — Proceeds from selling investments (capital gains).
+T2202 — Tuition amounts (from your school).
+T2200 — Signed by employer. Required to claim home office.
+T777 — Form for calculating home office deductions.
+RRSP receipts — from your bank when you contribute.
+Donation receipts — from charities.
+Medical receipts — prescriptions, dental, glasses, physio.
+
+═══════════════════════════════
+ALL TAX SOFTWARE — FULL LIST
+═══════════════════════════════
+NETFILE-certified filing software:
+• Wealthsimple Tax (simpletax.ca) — Best free option. Beginner-friendly. Auto-fill. Recommended.
+• TurboTax Canada (turbotax.intuit.ca) — Popular, good for all situations. Free for simple returns.
+• H&R Block (hrblock.ca) — Free option, can add in-person help.
+• GenuTax (genutax.ca) — Completely free, handles complex returns.
+• UFile (ufile.ca) — Free for students and simple returns.
+• CloudTax — Simple, free, good for basic returns.
+• StudioTax — Free desktop software.
+
+CRA APPS:
+• MyCRA mobile app — refund status, slips, address updates.
+• MyBenefits CRA — GST credit, Canada Child Benefit tracking.
+• CRA My Account (web) — full tax portal.
+
+REFERENCE SITES:
+• TaxTips.ca — best Canadian tax reference. Not for filing.
+• Canada.ca/taxes — official government tax info.
+
+═══════════════════════════════
+DEDUCTIONS & CREDITS EXPLAINED
+═══════════════════════════════
+DEDUCTION = reduces your income before tax is calculated.
+CREDIT = reduces the actual tax you owe. More powerful.
+
+DEDUCTIONS:
+• RRSP contributions — biggest tax tool for most Canadians.
+• Union dues (Box 44) — automatic.
+• Professional membership fees.
+• Childcare — daycare, camp, babysitters. Lower earner claims this.
+• Moving expenses — if moved 40km+ for work/school.
+• Home office — T2200 required. Portion of rent, internet, utilities.
+• Student loan interest — government student loans only.
+
+CREDITS:
+• Basic Personal Amount — $16,129 federal, $22,323 Alberta. Everyone gets this.
+• Spousal amount — if your spouse earns less than $16,129.
+• Canada Caregiver Credit — caring for a dependent with disability.
+• Disability Tax Credit (DTC) — severe disability. Must apply first.
+• Canada Workers Benefit — low-income workers. Refundable.
+• GST/HST Credit — automatic quarterly payment for lower-income Canadians.
+• Canada Child Benefit (CCB) — monthly tax-free payments for families with kids.
+• Charitable donation credit — 15% on first $200, 29% above $200.
+• Medical expense credit — above $2,635 or 3% of net income.
+• Tuition credit — from T2202. Carry forward unused amounts.
+• First Home Buyers' Amount — $10,000 credit if bought first home in 2025.
+• Climate Action Incentive — quarterly payment for Alberta residents. Automatic.
+• Age Amount — if you're 65+.
+• Pension income amount — if you receive eligible pension.
+
+═══════════════════════════════
+COUPLE'S TAX TIPS
+═══════════════════════════════
+Samira and Sean file separately but these work better on one return:
+• Medical expenses → lower-income spouse
+• Childcare → lower-income spouse (required by CRA)
+• Charitable donations → higher-income spouse (bigger credit)
+• Spousal amount → higher earner can claim if spouse earns under $16,129
+• RRSP → whoever is in a higher tax bracket benefits more per dollar
+• Pension income splitting → can transfer up to 50% of pension to lower-income spouse
+
+═══════════════════════════════
+STEP-BY-STEP: WEALTHSIMPLE TAX
+═══════════════════════════════
+1. Go to simpletax.ca. Create a free account.
+2. Click "Start a new return" → select 2025.
+3. Enter name, SIN, date of birth, Calgary Alberta address.
+4. Choose "Auto-fill my return." Log into CRA My Account. Slips appear automatically.
+5. Review the imported info. Check Box 14 and Box 22 look right.
+6. Answer the yes/no questions slowly. Most will be "No."
+7. Watch for: RRSP contributions? Work from home? Donations? Medical?
+8. Review the Summary page — see your refund in real time.
+9. Click Submit (NETFILE). Save your confirmation number.
+10. Check CRA My Account in 2 weeks for your Notice of Assessment.
+
+═══════════════════════════════
+COMMON BEGINNER MISTAKES
+═══════════════════════════════
+• Not filing — always file, even with no income. You may get money back.
+• Missing slips — use Auto-fill to catch everything.
+• Forgetting RRSP receipts — check your email and bank.
+• Not claiming medical expenses — small amounts add up.
+• Home office without T2200 — you need this signed by your employer.
+• No direct deposit — set it up for faster refunds.
+• Filing late when owing — always file on time, even if you can't pay.
+• Throwing away receipts — keep everything for 6 years.
+
+═══════════════════════════════
+IMPORTANT RULES
+═══════════════════════════════
+- You cannot actually file taxes — always use ${software}.
+- Never give legal or investment advice.
+- If something is beyond your knowledge, say so and recommend CRA or a professional.
+- Always be patient. Never make anyone feel bad for not knowing something.`;
+}
+
+// ═══════════════════════════════════════════════
+// DEADLINE COUNTDOWN
+// ═══════════════════════════════════════════════
+function updateCountdown(){
+  const deadline=new Date('2026-04-30T23:59:59');
+  const now=new Date();
+  const diff=Math.ceil((deadline-now)/(1000*60*60*24));
+  const el=document.getElementById('days-left');
+  const counter=document.getElementById('deadline-counter');
+  if(el){
+    el.textContent=diff>0?diff:'0';
+    if(diff<=30)counter.classList.add('urgent');
+    else counter.classList.remove('urgent');
+  }
+}
+updateCountdown();
+
+// ═══════════════════════════════════════════════
+// PROGRESS TRACKER
+// ═══════════════════════════════════════════════
+function updateOverallProgress(){
+  const allCl=checklistData.flatMap(s=>s.items);
+  const clDone=allCl.filter(i=>checkedItems[i.id]).length;
+  const stDone=stepsData.filter(s=>doneSteps[s.id]).length;
+  const total=allCl.length+stepsData.length;
+  const done=clDone+stDone;
+  const pct=total>0?Math.round((done/total)*100):0;
+  const fill=document.getElementById('hprog-fill');
+  const pctEl=document.getElementById('hprog-pct');
+  if(fill)fill.style.width=pct+'%';
+  if(pctEl)pctEl.textContent=pct+'%';
+}
+
+// ═══════════════════════════════════════════════
+// PERSON SWITCHER
+// ═══════════════════════════════════════════════
+let messages=loadMemory('messages',[]);
+let checkedItems=loadMemory('checkedItems',{});
+let doneSteps=loadMemory('doneSteps',{});
+let isLoading=false;
+
+function switchPerson(person){
+  currentPerson=person;
+  document.getElementById('btn-samira').classList.toggle('active',person==='samira');
+  document.getElementById('btn-sean').classList.toggle('active',person==='sean');
+  const displayName=person==='samira'?'Samira':'Sean';
+  const wn=document.getElementById('welcome-name');
+  if(wn)wn.textContent=displayName;
+
+  messages=loadMemory('messages',[]);
+  checkedItems=loadMemory('checkedItems',{});
+  doneSteps=loadMemory('doneSteps',{});
+
+  // Clear chat
+  const chatEl=document.getElementById('chat-messages');
+  chatEl.querySelectorAll('.message').forEach(m=>m.remove());
+  const banner=document.getElementById('memory-banner');
+  const memText=document.getElementById('memory-text');
+  if(messages.length>0){
+    banner.style.display='flex';
+    memText.innerHTML=`<strong>Switched to ${displayName}</strong> — ${messages.length} messages in history.`;
+    messages.slice(-6).forEach(m=>addMessageToDOM(m.role,formatResponse(m.content),false));
+  } else {
+    banner.style.display='none';
+  }
+
+  buildChecklist();
+  buildSteps();
+  loadProfile();
+  updateOverallProgress();
+
+  // Reset tips
+  document.getElementById('tips-ai-container').style.display='none';
+  document.getElementById('tips-ai-container').innerHTML='';
+  document.getElementById('tips-gen-area').innerHTML=`
+    <button class="tip-gen-btn" onclick="generateTips()"><span id="tips-btn-text">✨ Generate ${displayName}'s Personalized Tips</span></button>
+    <div class="tip-gen-note">Jeremy reads ${displayName}'s profile and finds savings just for them.</div>`;
+
+  switchTab('chat');
+  const cw=document.getElementById('chips-wrap');
+  if(cw&&messages.length===0)cw.style.display='block';
+}
+
+// ═══════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById('panel-'+name);
+  if(panel)panel.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════
+const chatEl=()=>document.getElementById('chat-messages');
+const inputEl=()=>document.getElementById('user-input');
+
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px'}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
+
+function sendChip(el){
+  const text=el.textContent.replace(/^\S+\s/,'').trim();
+  inputEl().value=text;
+  sendMessage();
+  document.getElementById('chips-wrap').style.display='none';
+}
+
+function addMessageToDOM(role,html,animate=true){
+  const isUser=role==='user';
+  const div=document.createElement('div');
+  div.className=`message ${isUser?'user':'ai'}`;
+  if(!animate)div.style.animation='none';
+  div.innerHTML=`
+    <div class="msg-avatar ${isUser?'user-av':'ai'}">${isUser?'👤':'🍁'}</div>
+    <div class="bubble-wrap">
+      <div class="msg-label">${isUser?'You':'Jeremy'}</div>
+      <div class="bubble">${html}</div>
+    </div>`;
+  chatEl().appendChild(div);
+  chatEl().scrollTop=chatEl().scrollHeight;
+}
+
+function showTyping(){
+  const div=document.createElement('div');
+  div.className='message ai';div.id='typing';
+  div.innerHTML=`<div class="msg-avatar ai">🍁</div><div class="bubble-wrap"><div class="msg-label">Jeremy</div><div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
+  chatEl().appendChild(div);chatEl().scrollTop=chatEl().scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+function formatResponse(text){
+  text=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  text=text.replace(/\*(.*?)\*/g,'<em>$1</em>');
+  text=text.replace(/\n\n/g,'<br><br>');
+  text=text.replace(/\n/g,'<br>');
+  return text;
+}
+
+async function sendMessage(){
+  const text=inputEl().value.trim();
+  if(!text||isLoading)return;
+
+  // Check for API key
+  const apiKey=localStorage.getItem('jeremy_api_key');
+  if(!apiKey){showApiKeyPrompt();return;}
+
+  document.getElementById('chips-wrap').style.display='none';
+  inputEl().value='';inputEl().style.height='auto';
+  isLoading=true;document.getElementById('send-btn').disabled=true;
+  addMessageToDOM('user',text);
+  messages.push({role:'user',content:text});
+  showTyping();
+  const trimmed=messages.slice(-20);
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1024,system:buildSystemPrompt(),messages:trimmed})
+    });
+    const data=await resp.json();
+    removeTyping();
+    if(data.error){
+      if(data.error.type==='authentication_error'){
+        localStorage.removeItem('jeremy_api_key');
+        addMessageToDOM('ai','⚠️ Your API key is invalid. Please re-enter it.');
+        setTimeout(showApiKeyPrompt,1500);
+      } else {
+        addMessageToDOM('ai',`⚠️ Error: ${data.error.message}`);
+      }
+    } else {
+      const reply=data.content?.map(b=>b.text||'').join('')||"Sorry, I didn't get a response. Try again!";
+      messages.push({role:'assistant',content:reply});
+      saveMemory('messages',messages.slice(-30));
+      addMessageToDOM('ai',formatResponse(reply));
+    }
+  }catch(e){
+    removeTyping();
+    addMessageToDOM('ai',`⚠️ Connection error: ${e.message}. Please try again.`);
+  }
+  isLoading=false;document.getElementById('send-btn').disabled=false;inputEl().focus();
+}
+
+function showApiKeyPrompt(){
+  // Remove any existing prompt
+  const existing=document.getElementById('api-key-modal');
+  if(existing)existing.remove();
+
+  const modal=document.createElement('div');
+  modal.id='api-key-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999';
+  modal.innerHTML=`
+    <div style="background:#fff;border-radius:16px;padding:28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+      <div style="font-size:24px;margin-bottom:8px">🔑</div>
+      <div style="font-size:18px;font-weight:600;color:#1a2332;margin-bottom:8px">Enter your Anthropic API Key</div>
+      <div style="font-size:13px;color:#4a5568;line-height:1.6;margin-bottom:16px">
+        Jeremy needs an API key to work. It's stored only in your browser — never sent anywhere else.<br><br>
+        Get a free key at <a href="https://console.anthropic.com" target="_blank" style="color:#4f86c6">console.anthropic.com</a> → API Keys.
+      </div>
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." style="width:100%;padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:13px;outline:none;margin-bottom:12px;font-family:monospace">
+      <button onclick="saveApiKey()" style="width:100%;padding:12px;background:linear-gradient(135deg,#4f86c6,#38a89d);border:none;border-radius:10px;color:white;font-size:14px;font-weight:600;cursor:pointer">Save & Start Chatting</button>
+      <div style="font-size:11px;color:#8898aa;text-align:center;margin-top:10px">Your key is saved in your browser only. Jeremy never sees it.</div>
+    </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>document.getElementById('api-key-input')?.focus(),100);
+}
+
+function saveApiKey(){
+  const key=document.getElementById('api-key-input')?.value.trim();
+  if(!key||!key.startsWith('sk-ant-')){
+    alert('Please enter a valid Anthropic API key (starts with sk-ant-)');
+    return;
+  }
+  localStorage.setItem('jeremy_api_key',key);
+  document.getElementById('api-key-modal')?.remove();
+  addMessageToDOM('ai',"Got it! I'm all set. What would you like to know about your taxes? 🍁");
+}
+
+function restoreChat(){
+  if(messages.length>0){
+    const banner=document.getElementById('memory-banner');
+    const memText=document.getElementById('memory-text');
+    const name=currentPerson==='samira'?'Samira':'Sean';
+    banner.style.display='flex';
+    memText.innerHTML=`<strong>Jeremy remembers:</strong> ${name}'s last conversation (${messages.length} messages). Pick up right where you left off!`;
+    messages.slice(-6).forEach(m=>addMessageToDOM(m.role,formatResponse(m.content),false));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CHECKLIST
+// ═══════════════════════════════════════════════
+const checklistData=[
+  {section:'🔐 Personal Info',items:[
+    {id:'sin',label:'Social Insurance Number (SIN)',desc:'Your 9-digit number. You need this to file.'},
+    {id:'cra',label:'CRA My Account login',desc:'Go to canada.ca/my-cra-account to set up or log in.'},
+    {id:'address',label:'Current address',desc:'Make sure CRA has your correct address.'},
+    {id:'banking',label:'Direct deposit set up with CRA',desc:'Get your refund in 2 weeks, not 6-8 by cheque.'},
+  ]},
+  {section:'💼 Income Slips',items:[
+    {id:'t4',label:'T4 — Employment Income',desc:'From your employer. Check your HR portal or email.'},
+    {id:'t4extra',label:'Other T4s (multiple jobs?)',desc:'If you worked more than one job in 2025.'},
+    {id:'t5',label:'T5 — Investment Income (if any)',desc:'From your bank if you earned interest or dividends.'},
+    {id:'t4e',label:'T4E — EI Income (if applicable)',desc:'If you received Employment Insurance in 2025.'},
+  ]},
+  {section:'💰 Deductions',items:[
+    {id:'rrsp',label:'RRSP contribution receipts (if any)',desc:'From your bank. Contributions up to Mar 2, 2026 count.'},
+    {id:'donations',label:'Charitable donation receipts (if any)',desc:'From any charities you donated to in 2025.'},
+    {id:'medical',label:'Medical expense receipts (if any)',desc:'Prescriptions, dental, glasses, physio, etc.'},
+    {id:'t2200',label:'T2200 — Work from home (if applicable)',desc:'Signed by your employer. Required to claim home office.'},
+    {id:'childcare',label:'Childcare receipts (if applicable)',desc:'Daycare, after-school, summer camp — claimed on lower earner.'},
+  ]},
+  {section:'📋 Helpful to Have',items:[
+    {id:'noa',label:'Last year\'s Notice of Assessment',desc:'Shows your RRSP room and carry-forward amounts.'},
+    {id:'wealthsimple',label:'Wealthsimple Tax account ready',desc:'Sign up free at simpletax.ca before you start.'},
+    {id:'spouse',label:'Spouse\'s net income (approx.)',desc:'You\'ll need to enter each other\'s net income when filing.'},
+  ]}
+];
+
+function buildChecklist(){
+  const container=document.getElementById('checklist-container');
+  container.innerHTML='';
+  checklistData.forEach(section=>{
+    const sec=document.createElement('div');
+    sec.innerHTML=`<div class="cl-section-label">${section.section}</div>`;
+    section.items.forEach(item=>{
+      const el=document.createElement('div');
+      el.className='cl-item'+(checkedItems[item.id]?' checked':'');
+      el.innerHTML=`<div class="cl-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="cl-label">${item.label}</div><div class="cl-desc">${item.desc}</div></div>`;
+      el.onclick=()=>{checkedItems[item.id]=!checkedItems[item.id];el.classList.toggle('checked',checkedItems[item.id]);saveMemory('checkedItems',checkedItems);updateChecklist();updateOverallProgress()};
+      sec.appendChild(el);
+    });
+    container.appendChild(sec);
+  });
+  updateChecklist();
+}
+
+function updateChecklist(){
+  const all=checklistData.flatMap(s=>s.items);
+  const done=all.filter(i=>checkedItems[i.id]).length;
+  const pct=Math.round((done/all.length)*100);
+  document.getElementById('cl-label').textContent=`${done} of ${all.length} items ready`;
+  document.getElementById('cl-pct').textContent=pct+'%';
+  document.getElementById('cl-bar').style.width=pct+'%';
+}
+
+// ═══════════════════════════════════════════════
+// GUIDE STEPS
+// ═══════════════════════════════════════════════
+const stepsData=[
+  {id:'s1',num:1,title:'Set up Wealthsimple Tax',desc:'Go to <strong>simpletax.ca</strong> and create a free account. Takes 2 minutes.',tip:'💡 Wealthsimple Tax is 100% free for simple returns like yours.'},
+  {id:'s2',num:2,title:'Start a new 2025 return',desc:'Click "Start a new return" and select <strong>2025</strong>. Enter your name, SIN, birthday, and Calgary, Alberta.',tip:'💡 Your SIN is the 9-digit number on your Social Insurance Number card.'},
+  {id:'s3',num:3,title:'Use Auto-fill to import your slips',desc:'Click <strong>"Auto-fill my return"</strong> and log into CRA My Account. Your T4 and slips appear automatically.',tip:'💡 This one step does 90% of the work. No manual typing needed.'},
+  {id:'s4',num:4,title:'Review what was imported',desc:'Check that Box 14 (your income) and Box 22 (tax paid) look right. Compare with your physical T4.',tip:'💡 If a slip is missing, you can add it manually using the + button.'},
+  {id:'s5',num:5,title:'Answer the questionnaire',desc:'Wealthsimple asks simple yes/no questions. Take your time. Watch for: <strong>RRSP? Work from home? Donations? Medical?</strong>',tip:'💡 If unsure, say No. You can always go back and change it.'},
+  {id:'s6',num:6,title:'Add your spouse\'s net income',desc:'Enter <strong>Sean\'s</strong> (or <strong>Samira\'s</strong>) approximate net income. You\'ll need this for the spousal amount and some credits.',tip:'💡 Net income = income after RRSP deductions. Find it on their NOA or estimate it.'},
+  {id:'s7',num:7,title:'Review the Summary page',desc:'Wealthsimple shows your refund estimate in real time. If something looks wrong, go back and check your T4 numbers.',tip:'💡 Use Jeremy\'s Refund Calculator tab to double-check the number.'},
+  {id:'s8',num:8,title:'Submit via NETFILE',desc:'Click <strong>Submit</strong>. Wealthsimple sends it directly to CRA. Write down your confirmation number!',tip:'💡 CRA sends refunds within 2 weeks if you have direct deposit set up.'},
+  {id:'s9',num:9,title:'Check your Notice of Assessment',desc:'In 2–3 weeks, log into CRA My Account to see your <strong>Notice of Assessment (NOA)</strong>. This confirms your taxes are accepted.',tip:'💡 Save your NOA. You\'ll need it next year for your RRSP room.'},
+];
+
+function buildSteps(){
+  const container=document.getElementById('steps-container');
+  container.innerHTML='';
+  stepsData.forEach(step=>{
+    const el=document.createElement('div');
+    el.className='step-card'+(doneSteps[step.id]?' done':'');
+    el.id=step.id;
+    el.innerHTML=`<div class="step-num">${doneSteps[step.id]?'✓':step.num}</div><div class="step-body"><div class="step-title">${step.title}</div><div class="step-desc">${step.desc}</div><div class="step-tip">${step.tip}</div><button class="step-done-btn" onclick="markStep('${step.id}',this.closest('.step-card'))">✓ Mark done</button></div>`;
+    container.appendChild(el);
+  });
+}
+
+function markStep(id,el){
+  doneSteps[id]=true;
+  el.classList.add('done');
+  el.querySelector('.step-num').textContent='✓';
+  saveMemory('doneSteps',doneSteps);
+  updateOverallProgress();
+}
+
+// ═══════════════════════════════════════════════
+// CALCULATOR
+// ═══════════════════════════════════════════════
+function calculateRefund(){
+  const income=parseFloat(document.getElementById('box14').value)||0;
+  const fedPaid=parseFloat(document.getElementById('box22').value)||0;
+  const provPaid=parseFloat(document.getElementById('box26').value)||0;
+  const rrsp=parseFloat(document.getElementById('rrsp').value)||0;
+  if(!income){alert('Please enter your income from Box 14 of your T4.');return}
+  const taxable=Math.max(0,income-rrsp);
+  const fedBPA=16129;
+  let fedTax=0;
+  const ft=Math.max(0,taxable-fedBPA);
+  if(ft<=57375)fedTax=ft*0.145;
+  else if(ft<=114750)fedTax=57375*0.145+(ft-57375)*0.205;
+  else if(ft<=177882)fedTax=57375*0.145+57375*0.205+(ft-114750)*0.26;
+  else fedTax=57375*0.145+57375*0.205+63132*0.26+(ft-177882)*0.29;
+  const abBPA=22323;
+  let abTax=0;
+  const at=Math.max(0,taxable-abBPA);
+  if(at<=60000)abTax=at*0.08;
+  else if(at<=151234)abTax=60000*0.08+(at-60000)*0.10;
+  else if(at<=181481)abTax=60000*0.08+91234*0.10+(at-151234)*0.12;
+  else abTax=60000*0.08+91234*0.10+30247*0.12+(at-181481)*0.13;
+  const fedR=fedPaid-fedTax;
+  const abR=provPaid-abTax;
+  const total=fedR+abR;
+  const fmt=n=>'$'+Math.abs(n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const isOwing=total<0;
+  const card=document.getElementById('result-card');
+  document.getElementById('result-label').textContent=isOwing?'Estimated Amount Owing':'Estimated Refund';
+  document.getElementById('result-amount').className='result-amount'+(isOwing?' result-owing':'');
+  document.getElementById('result-amount').textContent=fmt(total);
+  document.getElementById('result-breakdown').innerHTML=`
+    <div class="result-row"><span class="rl">Employment Income</span><span class="rv">${fmt(income)}</span></div>
+    ${rrsp?`<div class="result-row"><span class="rl">RRSP Deduction</span><span class="rv">− ${fmt(rrsp)}</span></div>`:''}
+    <div class="result-row"><span class="rl">Taxable Income</span><span class="rv">${fmt(taxable)}</span></div>
+    <div class="result-row"><span class="rl">Est. Federal Tax</span><span class="rv">${fmt(fedTax)}</span></div>
+    <div class="result-row"><span class="rl">Federal Tax Paid</span><span class="rv">${fmt(fedPaid)}</span></div>
+    <div class="result-row"><span class="rl">Federal ${fedR>=0?'Refund':'Owing'}</span><span class="rv">${fmt(fedR)}</span></div>
+    <div class="result-row"><span class="rl">Est. Alberta Tax</span><span class="rv">${fmt(abTax)}</span></div>
+    ${provPaid?`<div class="result-row"><span class="rl">Alberta Tax Paid</span><span class="rv">${fmt(provPaid)}</span></div>`:''}
+    <div class="result-row"><span class="rl">Alberta ${abR>=0?'Refund':'Owing'}</span><span class="rv">${fmt(abR)}</span></div>`;
+  card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══════════════════════════════════════════════
+// COUPLE'S OPTIMIZER
+// ═══════════════════════════════════════════════
+const optimizerItems=[
+  {icon:'🩺',label:'Medical Expenses',reason:'Better on the lower-income spouse. Threshold is lower = more claimable.',default:'samira'},
+  {icon:'👶',label:'Childcare Expenses',reason:'CRA requires this on the lower-income spouse. Non-negotiable.',default:'samira'},
+  {icon:'❤️',label:'Charitable Donations',reason:'Better on the higher-income spouse. Gets the 29% credit faster.',default:'sean'},
+  {icon:'🏠',label:'Home Office Expenses',reason:'Each person claims their own. Both need a T2200 from their employer.',default:'both'},
+  {icon:'💰',label:'RRSP Contributions',reason:'Whoever is in a higher tax bracket saves more per dollar contributed.',default:'sean'},
+  {icon:'💑',label:'Spousal Amount',reason:'Higher earner can claim if spouse earns under $16,129.',default:'sean'},
+  {icon:'🎓',label:'Tuition Credits (transfer)',reason:'Students can transfer up to $5,000 of unused tuition to a spouse.',default:'samira'},
+  {icon:'🏡',label:'Home Buyers\' Amount',reason:'Either spouse can claim the $10,000 credit if you bought a first home.',default:'samira'},
+];
+
+let optimizerState={};
+
+function buildOptimizer(){
+  const container=document.getElementById('opt-rows');
+  container.innerHTML='';
+  optimizerItems.forEach((item,i)=>{
+    const state=optimizerState[i]||item.default;
+    const el=document.createElement('div');
+    el.className='opt-row';
+    el.innerHTML=`
+      <div class="opt-icon">${item.icon}</div>
+      <div style="flex:1"><div class="opt-label">${item.label}</div><div class="opt-reason">${item.reason}</div></div>
+      <div class="opt-who">
+        ${item.default==='both'
+          ? '<span style="font-size:12px;color:var(--text-light);font-weight:600">Both file separately</span>'
+          : `<button class="opt-who-btn ${state}" onclick="toggleOpt(${i},this)">${state==='samira'?'Samira':'Sean'}</button>`
+        }
+      </div>`;
+    container.appendChild(el);
+  });
+}
+
+function toggleOpt(i,btn){
+  const current=optimizerState[i]||optimizerItems[i].default;
+  const next=current==='samira'?'sean':'samira';
+  optimizerState[i]=next;
+  btn.className=`opt-who-btn ${next}`;
+  btn.textContent=next==='samira'?'Samira':'Sean';
+  saveMemory('optimizerState',optimizerState);
+}
+
+// ═══════════════════════════════════════════════
+// TIPS
+// ═══════════════════════════════════════════════
+async function generateTips(){
+  const apiKey=localStorage.getItem('jeremy_api_key');
+  if(!apiKey){showApiKeyPrompt();return;}
+  const btn=document.querySelector('.tip-gen-btn');
+  const loading=document.getElementById('tips-loading');
+  const container=document.getElementById('tips-ai-container');
+  const genArea=document.getElementById('tips-gen-area');
+  btn.disabled=true;
+  const btnText=document.getElementById('tips-btn-text');
+  if(btnText)btnText.textContent='Generating...';
+  loading.style.display='block';
+  container.style.display='none';
+  const p=loadMemory('profile',{});
+  const profileSummary=`Name: ${p.name||currentPerson}, Province: ${p.province||'Alberta'}, Status: ${p.status||'married'}, Income: ${p.incomeType||'T4'}, Notes: ${p.notes||'none'}`;
+  const prompt=`You are a Canadian tax savings expert for 2025. Based on this profile, give 6 personalized money-saving tips. Profile: ${profileSummary}. Rules: relevant to their situation, 2-3 sentences each, include dollar estimate where possible, use **bold** for amounts. Return ONLY a JSON array: [{"icon":"💰","title":"Short title","desc":"Description with **bold** amounts.","savings":"Could save $X–$Y"}]. Nothing else.`;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await resp.json();
+    const raw=data.content?.map(b=>b.text||'').join('')||'[]';
+    const tips=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    container.innerHTML='<div class="tip-section-label">✨ Personalized Just For You</div>';
+    tips.forEach(tip=>{
+      const div=document.createElement('div');
+      div.className='tip-ai-card';
+      div.innerHTML=`<div class="tip-ai-tag">💡 Personalized</div><div class="tip-title">${tip.icon} ${tip.title}</div>${tip.savings?`<div class="tip-savings">📈 ${tip.savings}</div>`:''}<div class="tip-ai-text">${tip.desc.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+      container.appendChild(div);
+    });
+    container.style.display='block';
+    loading.style.display='none';
+    genArea.innerHTML=`<button class="tip-gen-btn" onclick="generateTips()" style="margin-bottom:8px">🔄 Regenerate Tips</button>`;
+  }catch(e){
+    loading.style.display='none';
+    btn.disabled=false;
+    if(btnText)btnText.textContent='✨ Generate My Personalized Tips';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GLOSSARY
+// ═══════════════════════════════════════════════
+const glossaryData=[
+  {term:'T4',def:'A slip from your employer showing how much you earned and how much tax was taken off your paycheque.',example:'Example: Box 14 on your T4 shows your total income for the year.'},
+  {term:'CRA',def:'Canada Revenue Agency — the government organization that collects taxes. Think of it as "the tax office."',example:'Example: You file your return with CRA every spring.'},
+  {term:'RRSP',def:'Registered Retirement Savings Plan. A special savings account where your money grows tax-free, and contributions reduce your income for this year\'s taxes.',example:'Example: If you earn $60,000 and put $5,000 in an RRSP, you only pay tax on $55,000.'},
+  {term:'TFSA',def:'Tax-Free Savings Account. A savings account where your money grows completely tax-free. Withdrawals are also tax-free. Does NOT reduce your taxes now.',example:'Example: You can put $7,000 into a TFSA in 2025 without any tax on what it earns.'},
+  {term:'NETFILE',def:'The secure electronic system that sends your tax return directly to CRA from approved software. No printing or mailing needed.',example:'Example: Wealthsimple Tax uses NETFILE to submit your return.'},
+  {term:'Notice of Assessment (NOA)',def:'The letter CRA sends after processing your return. It confirms your taxes are accepted and shows your RRSP room for next year.',example:'Example: After filing, check CRA My Account for your NOA in 2 weeks.'},
+  {term:'Deduction',def:'Something that reduces your income before tax is calculated. Less income = less tax.',example:'Example: An RRSP contribution is a deduction. If you earn $60,000 and contribute $5,000 to an RRSP, you\'re taxed on $55,000.'},
+  {term:'Credit',def:'Something that reduces the actual tax you owe — more powerful than a deduction. Can be refundable (you get cash back) or non-refundable (just reduces taxes to zero).',example:'Example: The basic personal amount is a credit that reduces everyone\'s federal tax.'},
+  {term:'Refundable Credit',def:'A tax credit that can give you money back even if you owe no tax.',example:'Example: The Canada Workers Benefit is refundable — you can receive it even if you paid no tax.'},
+  {term:'Non-refundable Credit',def:'A tax credit that reduces your tax to zero but doesn\'t give you extra money back.',example:'Example: The basic personal amount is non-refundable.'},
+  {term:'Basic Personal Amount',def:'The amount of income every Canadian gets tax-free. In 2025: $16,129 federal, $22,323 in Alberta.',example:'Example: If you earn $15,000, you pay zero federal income tax because it\'s under the basic personal amount.'},
+  {term:'Marginal Tax Rate',def:'The tax rate on your next dollar of income. In Canada, higher income = higher rate. But only that "slice" of income is taxed at the higher rate.',example:'Example: If you\'re in the 20.5% federal bracket, only income above $57,375 is taxed at 20.5%.'},
+  {term:'Taxable Income',def:'Your total income minus any deductions (like RRSP contributions). This is what your tax is actually calculated on.',example:'Example: Earn $65,000, contribute $5,000 to RRSP → taxable income is $60,000.'},
+  {term:'Net Income',def:'Your income after deductions like RRSP. This number goes on Line 23600 of your return. It affects benefit payments and some credits.',example:'Example: CRA uses your net income to calculate your GST credit and CCB payments.'},
+  {term:'Gross Income',def:'Your total income before any deductions. Box 14 on your T4.',example:'Example: If your salary is $65,000, that\'s your gross income.'},
+  {term:'Tax Bracket',def:'A range of income taxed at a specific rate. Canada has 5 federal brackets. You don\'t jump to a higher rate on all your income — only on the portion above each threshold.',example:'Example: In 2025, the first $57,375 is taxed at 14.5%. Income above that at 20.5%.'},
+  {term:'Direct Deposit',def:'When CRA sends your tax refund directly to your bank account. Takes 2 weeks. Without it, a cheque takes 6–8 weeks.',example:'Example: Set up direct deposit in CRA My Account for the fastest refund.'},
+  {term:'Auto-fill My Return',def:'A feature in tax software that connects to CRA and automatically imports your T4s and other slips.',example:'Example: In Wealthsimple Tax, click "Auto-fill" and log in with your CRA credentials.'},
+  {term:'GST/HST Credit',def:'A quarterly payment from the government to lower-income Canadians to offset the sales tax they pay. Applied for automatically when you file.',example:'Example: CRA determines if you qualify based on your income when you file.'},
+  {term:'Canada Child Benefit (CCB)',def:'A monthly tax-free payment for families with children under 18. The amount depends on your family income.',example:'Example: A family with two kids and $80,000 income may receive several hundred dollars per month.'},
+  {term:'Carry Forward',def:'Unused tax credits (like tuition) that you save for a future year when they\'ll be more valuable.',example:'Example: If you had $5,000 in tuition credits but owed no tax, carry them forward to next year.'},
+  {term:'T2200',def:'A form your employer signs confirming you were required to work from home. You need this to claim home office expenses.',example:'Example: Ask your HR department for a T2200 if you worked from home in 2025.'},
+  {term:'Capital Gain',def:'The profit you make when you sell an investment for more than you paid for it. In 2025, 50% of the first $250K gain is included in your taxable income.',example:'Example: Buy stocks for $10,000, sell for $15,000 → $5,000 capital gain, $2,500 added to income.'},
+  {term:'SIN',def:'Social Insurance Number. Your 9-digit personal tax ID number. Required to file taxes.',example:'Example: Your SIN is on your SIN card and is required on your tax return.'},
+  {term:'Spousal Amount',def:'A credit the higher-earning spouse can claim if their partner earns under $16,129 in 2025.',example:'Example: If Sean earns $80,000 and Samira earns $10,000, Sean can claim the spousal amount.'},
+  {term:'Climate Action Incentive',def:'A quarterly government payment for Albertans to offset carbon pricing costs. Filed automatically on your return.',example:'Example: A single adult in Alberta receives about $225 per quarter in 2025.'},
+  {term:'CPP',def:'Canada Pension Plan. A mandatory deduction from your paycheque (Box 16 on T4). Builds your retirement pension. Also deductible on your return.',example:'Example: In 2025, you contribute 5.95% of earnings up to $71,300.'},
+  {term:'EI',def:'Employment Insurance. A mandatory deduction (Box 18 on T4). Provides income if you lose your job. Premiums appear on your T4.',example:'Example: EI premiums paid are listed on Box 18 of your T4.'},
+  {term:'Pension Income Splitting',def:'Married couples can transfer up to 50% of eligible pension income to the lower-income spouse to reduce the overall tax bill.',example:'Example: If one spouse gets $40,000 pension, they can shift $20,000 to the other\'s return.'},
+  {term:'Disability Tax Credit (DTC)',def:'A non-refundable credit for people with a severe and prolonged disability. Must apply to CRA first with a doctor\'s certification.',example:'Example: Once approved, the DTC significantly reduces taxes owing.'},
+];
+
+function buildGlossary(){
+  const list=document.getElementById('glossary-list');
+  list.innerHTML='';
+  glossaryData.sort((a,b)=>a.term.localeCompare(b.term)).forEach(item=>{
+    const div=document.createElement('div');
+    div.className='glossary-item';
+    div.dataset.search=item.term.toLowerCase()+' '+item.def.toLowerCase();
+    div.innerHTML=`<div class="glossary-term">${item.term}</div><div class="glossary-def">${item.def}</div><div class="glossary-example">${item.example}</div>`;
+    list.appendChild(div);
+  });
+}
+
+function filterGlossary(query){
+  const q=query.toLowerCase().trim();
+  document.querySelectorAll('.glossary-item').forEach(el=>{
+    el.classList.toggle('glossary-hidden',q&&!el.dataset.search.includes(q));
+  });
+}
+
+// ═══════════════════════════════════════════════
+// APPS
+// ═══════════════════════════════════════════════
+const appsData=[
+  {section:'🔴 Must Have',apps:[
+    {icon:'🍃',iconBg:'#e8f5e9',name:'Wealthsimple Tax',desc:'The best free filing app in Canada. Use this to actually submit your return to CRA. Very beginner-friendly.',tag:'required',tagLabel:'Required — Start Here',url:'https://simpletax.ca'},
+    {icon:'🏛️',iconBg:'#fff3e0',name:'CRA My Account',desc:'The government portal. Use it for Auto-fill, checking RRSP room, and seeing your refund after filing.',tag:'required',tagLabel:'Required',url:'https://canada.ca/my-cra-account'},
+  ]},
+  {section:'🟡 Very Helpful',apps:[
+    {icon:'📱',iconBg:'#e3f2fd',name:'MyCRA Mobile App',desc:'Check your refund status and view notices on your phone after you file.',tag:'free',tagLabel:'Free',url:'https://apps.apple.com/ca/app/mycra/id1295784956'},
+    {icon:'🏦',iconBg:'#f3e5f5',name:'Your Bank App',desc:'Set up CRA direct deposit through your bank so your refund arrives in 2 weeks.',tag:'optional',tagLabel:'Recommended',url:'#'},
+  ]},
+  {section:'🟢 Good to Know',apps:[
+    {icon:'📊',iconBg:'#e8f5e9',name:'Wealthsimple Invest',desc:'Separate app for RRSP and TFSA investing. Free. Great if you want to start contributing.',tag:'optional',tagLabel:'Optional',url:'https://wealthsimple.com'},
+    {icon:'🧾',iconBg:'#fff8e1',name:'TurboTax Canada',desc:'Another NETFILE-certified option. Free for simple returns. Popular alternative to Wealthsimple.',tag:'free',tagLabel:'Free',url:'https://turbotax.intuit.ca'},
+    {icon:'📚',iconBg:'#fce4ec',name:'TaxTips.ca',desc:'The best Canadian tax reference website. Not for filing — for learning and looking things up.',tag:'optional',tagLabel:'Reference',url:'https://taxtips.ca'},
+    {icon:'📧',iconBg:'#ede7f6',name:'Your Employer\'s HR Portal',desc:'Where your T4 slip lives. ADP, Ceridian, or whatever your employer uses. Log in to download it.',tag:'required',tagLabel:'Required',url:'#'},
+  ]}
+];
+
+function buildApps(){
+  const container=document.getElementById('apps-container');
+  container.innerHTML='';
+  appsData.forEach(section=>{
+    const sec=document.createElement('div');
+    sec.innerHTML=`<div class="app-section-label">${section.section}</div>`;
+    section.apps.forEach(app=>{
+      const el=document.createElement('div');
+      el.className='app-card';
+      const isLink=app.url&&app.url!=='#';
+      if(isLink){el.style.cursor='pointer';el.onclick=()=>window.open(app.url,'_blank')}
+      const tagClass=app.tag==='required'?'tag-required':app.tag==='free'?'tag-free':'tag-optional';
+      el.innerHTML=`<div class="app-icon" style="background:${app.iconBg}">${app.icon}</div><div><div class="app-name">${app.name}${isLink?' ↗':''}</div><div class="app-desc">${app.desc}</div><span class="app-tag ${tagClass}">${app.tagLabel}</span></div>`;
+      sec.appendChild(el);
+    });
+    container.appendChild(sec);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════
+function saveProfile(){
+  const p={
+    name:document.getElementById('p-name').value.trim(),
+    city:document.getElementById('p-city').value.trim(),
+    province:document.getElementById('p-province').value,
+    status:document.getElementById('p-status').value,
+    incomeType:document.getElementById('p-income-type').value,
+    experience:document.getElementById('p-experience').value,
+    cra:document.getElementById('p-cra').value,
+    software:document.getElementById('p-software').value,
+    notes:document.getElementById('p-notes').value.trim(),
+    style:document.getElementById('p-style').value,
+    tone:document.getElementById('p-tone').value,
+  };
+  saveMemory('profile',p);
+  const badge=document.getElementById('saved-badge');
+  badge.classList.add('show');
+  setTimeout(()=>badge.classList.remove('show'),3000);
+}
+
+function loadProfile(){
+  const p=loadMemory('profile',{});
+  const fields={
+    'p-name':'name','p-city':'city','p-province':'province','p-status':'status',
+    'p-income-type':'incomeType','p-experience':'experience','p-cra':'cra',
+    'p-software':'software','p-notes':'notes','p-style':'style','p-tone':'tone'
+  };
+  Object.entries(fields).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el&&p[key])el.value=p[key];
+  });
+}
+
+function resetAll(){
+  if(!confirm('Reset ALL saved data for both Samira and Sean? This cannot be undone.'))return;
+  try{Object.keys(localStorage).filter(k=>k.startsWith('jeremy_')).forEach(k=>localStorage.removeItem(k))}catch(e){}
+  location.reload();
+}
+
+// ═══════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════
+// Pre-populate Samira's profile
+currentPerson='samira';
+if(!loadMemory('profile',null)){saveMemory('profile',{name:'Samira',city:'Calgary',province:'Alberta',status:'married/common-law'})}
+// Pre-populate Sean's profile
+currentPerson='sean';
+if(!loadMemory('profile',null)){saveMemory('profile',{name:'Sean',city:'Calgary',province:'Alberta',status:'married/common-law'})}
+// Start on Samira
+currentPerson='samira';
+messages=loadMemory('messages',[]);
+checkedItems=loadMemory('checkedItems',{});
+doneSteps=loadMemory('doneSteps',{});
+optimizerState=loadMemory('optimizerState',{});
+
+buildChecklist();
+buildSteps();
+buildOptimizer();
+buildApps();
+buildGlossary();
+loadProfile();
+restoreChat();
+updateCountdown();
+updateOverallProgress();
+
+// Show API key prompt if not yet saved
+if(!localStorage.getItem('jeremy_api_key')){
+  setTimeout(showApiKeyPrompt,800);
+}
+</script>
+</body>
+</html>
